@@ -15,8 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       const slideId = form.dataset.slideId;
-      const nome = form.querySelector("[name='nome']").value.trim();
-      const email = form.querySelector("[name='email']").value.trim();
+      const nomeInput = form.querySelector("[name='nome']");
+      const emailInput = form.querySelector("[name='email']");
+      const nome = nomeInput ? nomeInput.value.trim() : "";
+      const email = emailInput ? emailInput.value.trim() : "";
       const comentario = form.querySelector("[name='comentario']").value.trim();
       const mensagem = form.querySelector(".form-message");
 

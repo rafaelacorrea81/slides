@@ -375,18 +375,6 @@ function App() {
                 </h3>
 
                 <form className="comment-form space-y-4" data-slide-id={slideId}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <label className="text-sm font-semibold text-slate-700 mb-1">Nome:</label>
-                      <input type="text" name="nome" placeholder="Digite seu nome" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" />
-                    </div>
-
-                    <div className="flex flex-col">
-                      <label className="text-sm font-semibold text-slate-700 mb-1">E-mail:</label>
-                      <input type="email" name="email" placeholder="Digite seu e-mail" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" />
-                    </div>
-                  </div>
-
                   <div className="flex flex-col">
                     <label className="text-sm font-semibold text-slate-700 mb-1">Comentário:</label>
                     <textarea name="comentario" required placeholder="Escreva seu comentário sobre este slide" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-y" rows="3"></textarea>
