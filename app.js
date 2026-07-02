@@ -308,7 +308,11 @@ function App() {
 
       {/* Slide Container (16:9 Aspect Ratio) */}
       <div className="w-full max-w-5xl aspect-video bg-white rounded-xl shadow-2xl overflow-hidden relative transition-all duration-300 ring-1 ring-slate-900/5">
-        {slides[currentSlide]}
+        {slides.map((slide, index) => (
+          <div key={index} className={index === currentSlide ? "block h-full" : "hidden"}>
+            {slide}
+          </div>
+        ))}
       </div>
 
       {/* Controls */}
@@ -356,108 +360,48 @@ function App() {
         />
       </div>
 
-      {/* Seção de Comentários */}
-      <CommentSection slideId={`slide-${String(currentSlide + 1).padStart(2, '0')}`} />
-    </div>
-  );
-}
+      {/* Seção de Comentários (Existem todos no DOM, mas apenas o atual fica visível para o comments.js vincular) */}
+      <div className="w-full max-w-5xl mt-6">
+        {slides.map((_, index) => {
+          const slideId = `slide-${String(index + 1).padStart(2, '0')}`;
+          return (
+            <div key={slideId} className={index === currentSlide ? "block" : "hidden"}>
+              <div className="comentarios-slide bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  Comentários sobre este slide ({slideId})
+                </h3>
 
-// Componente de Comentários React
-function CommentSection({ slideId }) {
-  const [nome, setNome] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [comentario, setComentario] = React.useState('');
-  const [status, setStatus] = React.useState({ type: '', message: '' });
+                <form className="comment-form space-y-4" data-slide-id={slideId}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col">
+                      <label className="text-sm font-semibold text-slate-700 mb-1">Nome:</label>
+                      <input type="text" name="nome" placeholder="Digite seu nome" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" />
+                    </div>
 
-  // Limpar mensagens ao mudar de slide
-  React.useEffect(() => {
-    setStatus({ type: '', message: '' });
-    setComentario('');
-  }, [slideId]);
+                    <div className="flex flex-col">
+                      <label className="text-sm font-semibold text-slate-700 mb-1">E-mail:</label>
+                      <input type="email" name="email" placeholder="Digite seu e-mail" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" />
+                    </div>
+                  </div>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!comentario.trim()) {
-      setStatus({ type: 'error', message: 'Por favor, escreva um comentário.' });
-      return;
-    }
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-slate-700 mb-1">Comentário:</label>
+                    <textarea name="comentario" required placeholder="Escreva seu comentário sobre este slide" className="px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-y" rows="3"></textarea>
+                  </div>
 
-    setStatus({ type: 'loading', message: 'Enviando comentário...' });
-
-    try {
-      if (window.sendComment) {
-        await window.sendComment(slideId, nome, email, comentario);
-        setComentario('');
-        setStatus({ type: 'success', message: 'Comentário enviado com sucesso para moderação. Obrigada!' });
-      } else {
-        throw new Error("O Firebase não foi inicializado corretamente.");
-      }
-    } catch (error) {
-      console.error(error);
-      setStatus({ type: 'error', message: 'Não foi possível enviar o comentário. Tente novamente.' });
-    }
-  };
-
-  return (
-    <div className="w-full max-w-5xl mt-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-        Comentários sobre este slide ({slideId})
-      </h3>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Nome</label>
-            <input
-              type="text"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Seu nome"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">E-mail</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com (não será exposto)"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Comentário</label>
-          <textarea
-            value={comentario}
-            onChange={(e) => setComentario(e.target.value)}
-            required
-            rows="3"
-            placeholder="Escreva sua dúvida, sugestão ou contribuição sobre este slide..."
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-y"
-          />
-        </div>
-        
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <button
-            type="submit"
-            disabled={status.type === 'loading'}
-            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-          >
-            {status.type === 'loading' ? 'Enviando...' : 'Enviar comentário'}
-          </button>
-          
-          {status.message && (
-            <p className={`text-sm font-medium ${status.type === 'success' ? 'text-green-600' : status.type === 'error' ? 'text-red-600' : 'text-slate-500'}`}>
-              {status.message}
-            </p>
-          )}
-        </div>
-      </form>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <button type="submit" className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Enviar comentário</button>
+                    <p className="form-message text-sm font-medium mt-2"></p>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
